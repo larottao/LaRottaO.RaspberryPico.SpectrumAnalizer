@@ -2,8 +2,8 @@ import math
 import time
 
 # Constants
-FREQUENCY = 500  # 1000 Hz
-SAMPLES = 512  # Increased number of samples
+FREQUENCY = 30 
+SAMPLES = 256  # Increased number of samples
 SAMPLING_RATE = 48000  # Total number of samples per second
 
 # Frequencies to analyze
@@ -67,10 +67,19 @@ def hamming_window(samples):
         windowed_samples.append(samples[n] * window_value)
     return windowed_samples
 
+# Kaiser window function
+def kaiser_window(samples, beta=5):
+    windowed_samples = []
+    for n in range(len(samples)):
+        arg = 1 - ((n - (len(samples) - 1) / 2) / ((len(samples) - 1) / 2)) ** 2
+        bessel = math.sqrt(math.pi) * math.e ** (1 / beta) / (2 * beta)
+        window_value = bessel * math.sqrt(arg)
+        windowed_samples.append(samples[n] * window_value)
+    return windowed_samples
 
 # Main Loop
 audio_samples = generate_sine_wave(FREQUENCY, SAMPLES, SAMPLING_RATE)
-windowed_samples = hamming_window(audio_samples)
+windowed_samples = kaiser_window(audio_samples)
 normalized_samples = normalize_samples(windowed_samples)
 intensities = analyze_frequencies(normalized_samples, SAMPLING_RATE, TARGET_FREQUENCIES)
 
