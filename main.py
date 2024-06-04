@@ -2,12 +2,13 @@ import math
 import time
 
 # Constants
-FREQUENCY = 250 
+FREQUENCY =  300
 SAMPLES = 256  # Increased number of samples
 SAMPLING_RATE = 48000  # Total number of samples per second
 
 # Frequencies to analyze
-TARGET_FREQUENCIES = [30, 60, 125, 250, 375, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000, 12000, 16000, 20000]
+#TARGET_FREQUENCIES = [30, 60, 125, 250, 375, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000, 12000, 16000, 20000]
+TARGET_FREQUENCIES = [125, 250, 375, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000, 12000, 16000, 20000]
 
 # Maximum expected intensity
 MAXIMUM_EXPECTED_INTENSITY = 100
@@ -59,7 +60,7 @@ def normalize_samples(samples):
 def normalize_intensity(intensity):
     return (intensity / MAXIMUM_EXPECTED_INTENSITY) * 8 if intensity < MAXIMUM_EXPECTED_INTENSITY else 8
 
-# Hamming window function
+# Hamming window function UNUSED
 def hamming_window(samples):
     windowed_samples = []
     for n in range(len(samples)):
@@ -68,7 +69,7 @@ def hamming_window(samples):
     return windowed_samples
 
 # Kaiser window function
-def kaiser_window(samples, beta=5):
+def kaiser_window(samples, beta=10):
     windowed_samples = []
     for n in range(len(samples)):
         arg = 1 - ((n - (len(samples) - 1) / 2) / ((len(samples) - 1) / 2)) ** 2
@@ -93,28 +94,48 @@ def print_bins():
     print("Bin indices for target frequencies:")
     for freq, index in zip(TARGET_FREQUENCIES, bin_indices):
         print(f"Frequency {freq} Hz: Bin index {index}")
+    
+    frequency_resolution = SAMPLING_RATE / SAMPLES
+
+    # Original target frequencies below 500 Hz
+    original_frequencies_below_500 = [30, 60, 125, 250, 375]
+
+    # Adjust frequencies to align with frequency resolution
+    adjusted_frequencies_below_500 = [
+        int(frequency_resolution * round(freq / frequency_resolution)) 
+        for freq in original_frequencies_below_500
+        ]
+
+    print("Adjusted Frequencies Below 500 Hz:", adjusted_frequencies_below_500)
+
+
     print(f"\n")
+    
+def print_intensities():
+    # Print the intensities for the target frequencies
+    for freq in TARGET_FREQUENCIES:
+        intensity = intensities[freq]
+        normalized_intensity = normalize_intensity(intensity)
+        print(f"Frequency {freq} Hz: Intensity {intensity}, Normalized Intensity {normalized_intensity:.2f}")
 
 # Main Loop
-
-print_bins()
-
-audio_samples = generate_sine_wave(FREQUENCY, SAMPLES, SAMPLING_RATE)
-windowed_samples = kaiser_window(audio_samples)
-normalized_samples = normalize_samples(windowed_samples)
-intensities = analyze_frequencies(normalized_samples, SAMPLING_RATE, TARGET_FREQUENCIES)
-
 
 print(f"INPUT FREQUENCY: {FREQUENCY}")
 print(f"SAMPLES: {SAMPLES}")
 print(f"SAMPLING_RATE: {SAMPLING_RATE}")
 print(f"\n")
 
-# Print the intensities for the target frequencies
-for freq in TARGET_FREQUENCIES:
-    intensity = intensities[freq]
-    normalized_intensity = normalize_intensity(intensity)
-    print(f"Frequency {freq} Hz: Intensity {intensity}, Normalized Intensity {normalized_intensity:.2f}")
+print_bins()
+audio_samples = generate_sine_wave(FREQUENCY, SAMPLES, SAMPLING_RATE)
+windowed_samples = kaiser_window(audio_samples)
+normalized_samples = normalize_samples(windowed_samples)
+intensities = analyze_frequencies(normalized_samples, SAMPLING_RATE, TARGET_FREQUENCIES)
+print_intensities()
+
+
+
+
+
     
     
 
