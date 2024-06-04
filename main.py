@@ -2,7 +2,7 @@ import math
 import time
 
 # Constants
-FREQUENCY = 30 
+FREQUENCY = 250 
 SAMPLES = 256  # Increased number of samples
 SAMPLING_RATE = 48000  # Total number of samples per second
 
@@ -77,7 +77,28 @@ def kaiser_window(samples, beta=5):
         windowed_samples.append(samples[n] * window_value)
     return windowed_samples
 
+def print_bins():
+    
+    #Bin frequency= Sampling rate​/Number of samples
+    #Each bin will correspond to a frequency range determined by this formula.
+    #For example, if you have 256 samples and a sampling rate of 48000 Hz, each frequency bin will cover:
+    #48000256≈187.5 Hz25648000​≈187.5 Hz
+
+    # Calculate frequency range per bin
+    bin_frequency = SAMPLING_RATE / SAMPLES
+
+    # Calculate bin indices for target frequencies
+    bin_indices = [round(freq / bin_frequency) for freq in TARGET_FREQUENCIES]
+
+    print("Bin indices for target frequencies:")
+    for freq, index in zip(TARGET_FREQUENCIES, bin_indices):
+        print(f"Frequency {freq} Hz: Bin index {index}")
+    print(f"\n")
+
 # Main Loop
+
+print_bins()
+
 audio_samples = generate_sine_wave(FREQUENCY, SAMPLES, SAMPLING_RATE)
 windowed_samples = kaiser_window(audio_samples)
 normalized_samples = normalize_samples(windowed_samples)
@@ -94,3 +115,6 @@ for freq in TARGET_FREQUENCIES:
     intensity = intensities[freq]
     normalized_intensity = normalize_intensity(intensity)
     print(f"Frequency {freq} Hz: Intensity {intensity}, Normalized Intensity {normalized_intensity:.2f}")
+    
+    
+
