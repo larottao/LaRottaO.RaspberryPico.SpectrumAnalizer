@@ -2,7 +2,7 @@ import math
 import time
 
 # Constants
-FREQUENCY = 16000  # 1000 Hz
+FREQUENCY = 500  # 1000 Hz
 SAMPLES = 512  # Increased number of samples
 SAMPLING_RATE = 48000  # Total number of samples per second
 
@@ -59,16 +59,26 @@ def normalize_samples(samples):
 def normalize_intensity(intensity):
     return (intensity / MAXIMUM_EXPECTED_INTENSITY) * 8 if intensity < MAXIMUM_EXPECTED_INTENSITY else 8
 
+# Hamming window function
+def hamming_window(samples):
+    windowed_samples = []
+    for n in range(len(samples)):
+        window_value = 0.54 - 0.46 * math.cos(2 * math.pi * n / (len(samples) - 1))
+        windowed_samples.append(samples[n] * window_value)
+    return windowed_samples
+
+
 # Main Loop
 audio_samples = generate_sine_wave(FREQUENCY, SAMPLES, SAMPLING_RATE)
-normalized_samples = normalize_samples(audio_samples)
+windowed_samples = hamming_window(audio_samples)
+normalized_samples = normalize_samples(windowed_samples)
+intensities = analyze_frequencies(normalized_samples, SAMPLING_RATE, TARGET_FREQUENCIES)
+
 
 print(f"INPUT FREQUENCY: {FREQUENCY}")
 print(f"SAMPLES: {SAMPLES}")
 print(f"SAMPLING_RATE: {SAMPLING_RATE}")
 print(f"\n")
-
-intensities = analyze_frequencies(normalized_samples, SAMPLING_RATE, TARGET_FREQUENCIES)
 
 # Print the intensities for the target frequencies
 for freq in TARGET_FREQUENCIES:
