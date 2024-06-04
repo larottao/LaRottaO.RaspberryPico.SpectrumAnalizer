@@ -1,19 +1,16 @@
 import math
 import time
-from machine import Pin, ADC
 
 # Constants
-ADC_RESOLUTION = 65535
-VOLTAGE_REF = 3.3
-PEAK_VOLTAGE = 2.5
-FREQUENCY = 30
-SAMPLES = 256
+FREQUENCY = 16000  # 1000 Hz
+SAMPLES = 512  # Increased number of samples
 SAMPLING_RATE = 48000  # Total number of samples per second
-MAXIMUM_EXPECTED_INTENSITY = 128
 
 # Frequencies to analyze
 TARGET_FREQUENCIES = [30, 60, 125, 250, 375, 500, 750, 1000, 1500, 2000, 3000, 4000, 6000, 8000, 12000, 16000, 20000]
 
+# Maximum expected intensity
+MAXIMUM_EXPECTED_INTENSITY = 100
 
 # Function to generate simulated sine wave samples
 def generate_sine_wave(frequency, samples, sampling_rate):
@@ -60,9 +57,9 @@ def normalize_samples(samples):
 
 # Normalize intensity to range 0-8 where 0 is 0 and max_intensity is 100
 def normalize_intensity(intensity):
-    return (intensity / MAXIMUM_EXPECTED_INTENSITY) * 8
+    return (intensity / MAXIMUM_EXPECTED_INTENSITY) * 8 if intensity < MAXIMUM_EXPECTED_INTENSITY else 8
 
-# Example usage
+# Main Loop
 audio_samples = generate_sine_wave(FREQUENCY, SAMPLES, SAMPLING_RATE)
 normalized_samples = normalize_samples(audio_samples)
 
